@@ -1,14 +1,15 @@
 import { json } from "react-router-dom"
 import "../styles/home.css"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Toaster, toast } from "sonner"
+import "../styles/register.css"
 
 const initialUserState = {
     name: "",
     username: "",
     email: "",
-    avatar: "",
+    avatar: null,
     password: ""
 }
 
@@ -16,7 +17,17 @@ const urlBase = import.meta.env.VITE_BACKEND_URL
 
 const Register = () => {
     const [user, setUser] = useState(initialUserState)
+    const fileInputRef = useRef(null)
+
     const navigate = useNavigate()
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0]
+        setUser({
+            ...user,
+            avatar: file
+        })
+    }
 
 
     const handleChange = ({ target }) => {
@@ -42,12 +53,13 @@ const Register = () => {
             method: "POST",
             body: formData
         })
-        
+
         if (response.ok) {
             setUser(initialUserState)
+            fileInputRef.current.value = null
             setTimeout(() => {
                 navigate("/login")
-            }, 1000)
+            }, 500)
 
 
         } else if (response.status == 409) {
@@ -61,16 +73,18 @@ const Register = () => {
     return (
         <div className="container">
             <Toaster position="top-center" richColors />
-            <div className="vh-100 d-flex flex-column">
-                <div className="row justify-content-center my-5">
-                    <h2 className="text-center py-3">Regístrate en nuestra página</h2>
+            <div className="d-flex flex-column">
+                <div className="row justify-content-center my-4">
+                    <div className="col-7 mb-4">
+                        <h1 className="text-center bg-warning-subtle mx-5 p-4">Regístrate en ActívaT</h1>
+                    </div>
                     <div className="col-12 col-md-6">
                         <form
-                            className="border border-secundary p-5"
+                            className="border border-secundary p-5 bg-azul"
                             onSubmit={handleSubmit}
                         >
                             <div className="form-group mb-3">
-                                <label htmlFor="txtNAme">Nombre completo</label>
+                                <label htmlFor="txtNAme" className="mb-2"><b>Nombre completo:</b></label>
                                 <input
                                     type="text"
                                     placeholder="Jhon Doe"
@@ -81,8 +95,8 @@ const Register = () => {
                                     value={user.name}
                                 />
                             </div>
-                            <div className="form-group mb-3">
-                                <label htmlFor="txtEmail">Correo</label>
+                            <div className="form-group my-4">
+                                <label htmlFor="txtEmail" className="mb-2"><b>Correo:</b></label>
                                 <input
                                     type="email"
                                     placeholder="ejmeplo@email.com"
@@ -93,8 +107,8 @@ const Register = () => {
                                     value={user.email}
                                 />
                             </div>
-                            <div className="form-group mb-3">
-                                <label htmlFor="txtUsername">Nombre de ususario</label>
+                            <div className="form-group my-4">
+                                <label htmlFor="txtUsername" className="mb-2"><b>Nombre de ususario:</b></label>
                                 <input
                                     type="text"
                                     placeholder="usuario"
@@ -105,21 +119,23 @@ const Register = () => {
                                     value={user.username}
                                 />
                             </div>
-                            <div className="form-group mb-3">
-                                <label htmlFor="txtAvatar">Avatar</label>
+                            <div className="form-group my-4">
+                                <label htmlFor="txtAvatar" className="mb-2"><b>Avatar:</b></label>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     className="form-control"
                                     id="txtAvatar"
                                     name="avatar"
-                                    onChange={(event) => {
-                                        setUser({ ...user, avatar: event.target.files[0] })
-                                    }}
+                                    ref={fileInputRef}
+                                    // onChange={(event) => {
+                                    //     setUser({ ...user, avatar: event.target.files[0] })
+                                    // }}
+                                    onChange={handleFileChange}
                                 />
                             </div>
-                            <div className="form-group mb-3">
-                                <label htmlFor="btnPassword">Contraseña: </label>
+                            <div className="form-group my-4">
+                                <label htmlFor="btnPassword" className="mb-2"><b>Contraseña:</b> </label>
                                 <input
                                     type="password"
                                     placeholder="******************"

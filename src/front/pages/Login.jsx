@@ -2,6 +2,7 @@ import "../styles/home.css"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
+import "../styles/login.css"
 
 const initialUserState = {
     username: "",
@@ -72,14 +73,16 @@ const Login = () => {
     return (
         <div className="container vh-100 d-flex flex-column justify-content-center sin-scroll">
             <div className="row justify-content-center">
-                <h1 className="text-center">Ingresa a nuestra plataforma</h1>
+                <div className="col-7">
+                    <h1 className="text-center bg-warning-subtle mx-5 p-4">Ingresa ActívaT</h1>
+                </div>
                 <div className="col-12 col-md-6 py-4">
                     <form
                         onSubmit={handleSubmit}
-                        className="border border-secundary p-5"
+                        className="border border-secundary p-5 bg-verdes"
                     >
                         <div className="form-group mb-3">
-                            <label htmlFor="btnUsername">Username: </label>
+                            <label htmlFor="btnUsername" className="mb-2"><b>Username:</b> </label>
                             <input
                                 type="text"
                                 placeholder="nombre de usuario"
@@ -89,8 +92,8 @@ const Login = () => {
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="form-group mb-3">
-                            <label htmlFor="btnPassword">Contraseña: </label>
+                        <div className="form-group my-4">
+                            <label htmlFor="btnPassword" className="mb-2" ><b>Contraseña: </b></label>
                             <input
                                 type="password"
                                 placeholder="******************"

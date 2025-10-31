@@ -12,12 +12,12 @@ export const Welcome = () => {
         <>
             {
                 store.user != null &&
-                <div className="container my-3">
+                <div className="container my-3 d-flex justify-content-around">
                     <p>Hola {`${user?.name}`}</p>
-                    <p>Mi correo es {`${user?.email}`}</p>
                     <div>
                         <img className="formato-imagen" src={user?.image} alt="avatarusuario" />
                     </div>
+                    <p>Usuario {`${user?.username}`}</p>
                 </div>
             }
         </>

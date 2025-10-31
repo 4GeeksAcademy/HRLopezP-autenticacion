@@ -16,20 +16,20 @@ export const Navbar = () => {
 	return (
 		<nav className="navbar navbar-expand-sm navbar-dark bg-dark">
 			<div className="container-fluid">
-				<a className="navbar-brand" href="#">Todos</a>
+				<a className="navbar-brand" href="#">ActívaT</a>
 				<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 					<span className="navbar-toggler-icon"></span>
 				</button>
 				<div className="collapse navbar-collapse" id="navbarNav">
 					<ul className="navbar-nav ms-auto navbar-ul">
-						<li className="nav-item">
+						<li className="nav-item mx-2">
 							<NavLink
 								// className="nav-link active" to={"/"}
 								className={({ isActive }) => `nav-link ${isActive ? "bordered" : ""}`}
 								to={"/"}
 							>Inicio</NavLink>
 						</li>
-						<li className="nav-item">
+						<li className="nav-item mx-3" >
 							<NavLink
 								className={({ isActive }) => `nav-link ${isActive ? "bordered" : ""}`}
 								to={"/todos"}
@@ -40,7 +40,7 @@ export const Navbar = () => {
 						store.token ? (
 							<div>
 								<button
-									className="btn btn-outline-secondary ms-3"
+									className="btn btn-outline-danger ms-3"
 									onClick={() => logout()}
 								>Cerrar sesión</button>
 							</div>
@@ -48,7 +48,7 @@ export const Navbar = () => {
 							<div>
 								<NavLink
 									to={"/login"}
-									className={"btn btn-outline-light"}>
+									className={"btn btn-outline-warning"}>
 									Iniciar Sesión
 								</NavLink>
 							</div>
