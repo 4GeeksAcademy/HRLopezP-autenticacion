@@ -10,6 +10,7 @@ from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
+import cloudinary.uploader as uploader
 
 api = Blueprint('api', __name__)
 
@@ -21,16 +22,18 @@ CORS(api)
 def health_check():
     return jsonify({"status": "OK"}), 200
 
- 
 
 @api.route("/register", methods=["POST"])
 def register_user():
-    data = request.get_json()
+    data_form = request.form
+    data_files = request.files
+
     data = {
-        "email": data.get("email"),
-        "password": data.get("password"),
-        "username": data.get("username"),
-        "name": data.get("name"),
+        "email": data_form.get("email"),
+        "password": data_form.get("password"),
+        "username": data_form.get("username"),
+        "name": data_form.get("name"),
+        "avatar": data_files.get("avatar"),
         "is_active": True,
         "salt": 1
     }
@@ -46,7 +49,13 @@ def register_user():
 
     salt = b64encode(os.urandom(32)).decode("utf-8")
     password = generate_password_hash(f"{data['password']}{salt}")
-    avatar_value = data.get("avatar") 
+
+    avatar = "https://i.pravatar.cc/300"
+    if data.get("avatar") is not None:
+        avatar = uploader.upload(data.get("avatar"))
+        avatar = avatar["secure_url"]
+
+
     new_user = User(
         email=data["email"],
         password=password,
@@ -54,7 +63,7 @@ def register_user():
         username=data["username"],
         is_active=data["is_active"],
         salt=salt,
-        avatar= avatar_value
+        avatar=avatar,
     )
 
     db.session.add(new_user)
@@ -66,7 +75,6 @@ def register_user():
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
 
- 
 
 @api.route("/login", methods=["POST"])
 def login_user():
@@ -90,7 +98,6 @@ def login_user():
 def protected():
     id = get_jwt_identity()
     return jsonify({"message": f"This is a protected route. Currente user ID : {id}"})
-
 
 
 @api.route("/me", methods=["GET"])

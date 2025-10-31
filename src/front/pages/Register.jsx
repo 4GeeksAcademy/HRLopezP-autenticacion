@@ -30,13 +30,19 @@ const Register = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
 
+
+        const formData = new FormData()
+        formData.append("name", user.name)
+        formData.append("email", user.email)
+        formData.append("password", user.password)
+        formData.append("avatar", user.avatar)
+        formData.append("username", user.username)
+
         const response = await fetch(`${urlBase}/register`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(user)
+            body: formData
         })
+        
         if (response.ok) {
             setUser(initialUserState)
             setTimeout(() => {
@@ -55,7 +61,7 @@ const Register = () => {
     return (
         <div className="container">
             <Toaster position="top-center" richColors />
-            <div className="vh-100 d-flex flex-column"> 
+            <div className="vh-100 d-flex flex-column">
                 <div className="row justify-content-center my-5">
                     <h2 className="text-center py-3">Regístrate en nuestra página</h2>
                     <div className="col-12 col-md-6">

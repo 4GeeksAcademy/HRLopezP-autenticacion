@@ -35,10 +35,13 @@ const Login = () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(user)
+
             })
             const data = await response.json()
+
             if (response.ok) {
                 dispatch({ type: "SET_TOKEN", payload: data.token })
+
 
                 const responseUser = await fetch(`${urlBase}/me`, {
                     method: "GET",
@@ -53,11 +56,14 @@ const Login = () => {
                     type: "SET_USER",
                     payload: dataUser.user
                 })
+
                 localStorage.setItem("token", data.token)
                 localStorage.setItem("user", JSON.stringify(dataUser.user))
 
                 navigate("/")
+
             }
+
         } catch (error) {
             console.log(error)
         }

@@ -30,6 +30,7 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "is_Active": self.is_active,
+            "username": self.username,
             "image": self.avatar
         }
 
