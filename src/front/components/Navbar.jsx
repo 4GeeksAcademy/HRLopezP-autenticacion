@@ -24,7 +24,6 @@ export const Navbar = () => {
 					<ul className="navbar-nav ms-auto navbar-ul">
 						<li className="nav-item mx-2">
 							<NavLink
-								// className="nav-link active" to={"/"}
 								className={({ isActive }) => `nav-link ${isActive ? "bordered" : ""}`}
 								to={"/"}
 							>Inicio</NavLink>

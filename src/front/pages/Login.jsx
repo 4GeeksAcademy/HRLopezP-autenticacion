@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
 import "../styles/login.css"
+import { Toaster, toast } from "sonner"
 
 const initialUserState = {
     username: "",
@@ -62,16 +63,19 @@ const Login = () => {
                 localStorage.setItem("user", JSON.stringify(dataUser.user))
 
                 navigate("/")
-
+            } else {
+                toast.error("Credenciales incorrectas. Intenta de nuevo.")
             }
 
         } catch (error) {
             console.log(error)
+            toast.error("Error de conexión. Intenta de nuevo más tarde.")
         }
     }
 
     return (
         <div className="container vh-100 d-flex flex-column justify-content-center sin-scroll">
+            <Toaster position="top-center" richColors />
             <div className="row justify-content-center">
                 <div className="col-7">
                     <h1 className="text-center bg-warning-subtle mx-5 p-4">Ingresa ActívaT</h1>
@@ -110,7 +114,7 @@ const Login = () => {
                 </div>
                 <div className="w-100"></div>
                 <div className="col-12 col-md-6 d-flex justify-content-between my-1">
-                    <Link to="/register">
+                    <Link to="/signup">
                         Registrarme
                     </Link>
                     <Link>

@@ -3,7 +3,7 @@ import "../styles/home.css"
 import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Toaster, toast } from "sonner"
-import "../styles/register.css"
+import "../styles/signup.css"
 
 const initialUserState = {
     name: "",
@@ -15,7 +15,7 @@ const initialUserState = {
 
 const urlBase = import.meta.env.VITE_BACKEND_URL
 
-const Register = () => {
+const Signup = () => {
     const [user, setUser] = useState(initialUserState)
     const fileInputRef = useRef(null)
 
@@ -159,4 +159,4 @@ const Register = () => {
     )
 }
 
-export default Register
+export default Signup;
