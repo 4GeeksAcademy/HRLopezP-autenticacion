@@ -1,7 +1,7 @@
 import { json } from "react-router-dom"
 import "../styles/home.css"
 import { useState, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { Toaster, toast } from "sonner"
 import "../styles/signup.css"
 
@@ -10,7 +10,8 @@ const initialUserState = {
     username: "",
     email: "",
     avatar: null,
-    password: ""
+    password: "",
+    confirmPassword: ""
 }
 
 const urlBase = import.meta.env.VITE_BACKEND_URL
@@ -18,6 +19,8 @@ const urlBase = import.meta.env.VITE_BACKEND_URL
 const Signup = () => {
     const [user, setUser] = useState(initialUserState)
     const fileInputRef = useRef(null)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const navigate = useNavigate()
 
@@ -28,6 +31,16 @@ const Signup = () => {
             avatar: file
         })
     }
+
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
 
 
     const handleChange = ({ target }) => {
@@ -41,6 +54,10 @@ const Signup = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
 
+        if (user.password !== user.confirmPassword) {
+            toast.error("Las contraseñas no coinciden. Por favor, revísalas.");
+            return;
+        }
 
         const formData = new FormData()
         formData.append("name", user.name)
@@ -49,23 +66,29 @@ const Signup = () => {
         formData.append("avatar", user.avatar)
         formData.append("username", user.username)
 
-        const response = await fetch(`${urlBase}/register`, {
-            method: "POST",
-            body: formData
-        })
+        try {
+            const response = await fetch(`${urlBase}/register`, {
+                method: "POST",
+                body: formData
+            })
 
-        if (response.ok) {
-            setUser(initialUserState)
-            fileInputRef.current.value = null
-            setTimeout(() => {
-                navigate("/login")
-            }, 500)
-
-
-        } else if (response.status == 409) {
-            toast.error("El usuario ya existe")
-        } else {
-            toast.error("Error al registrar usuario, intenta nuevamente")
+            if (response.ok) {
+                toast.success("¡Registro exitoso! Felicitaciones");
+                setUser(initialUserState)
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = null
+                }
+                setTimeout(() => {
+                    navigate("/login")
+                }, 1000)
+            } else if (response.status === 409) {
+                toast.error("El usuario ya existe. Intenta con otro nombre o correo.");
+            } else {
+                toast.error("Error al registrar usuario, intenta nuevamente")
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            toast.error("Error de conexión con el servidor. Intenta de nuevo más tarde.");
         }
     }
 
@@ -106,7 +129,7 @@ const Signup = () => {
                                     onChange={handleChange}
                                     value={user.email}
                                 />
-                            </div>
+                            </div> 
                             <div className="form-group my-4">
                                 <label htmlFor="txtUsername" className="mb-2"><b>Nombre de ususario:</b></label>
                                 <input
@@ -117,7 +140,7 @@ const Signup = () => {
                                     name="username"
                                     onChange={handleChange}
                                     value={user.username}
-                                />
+                                /> 
                             </div>
                             <div className="form-group my-4">
                                 <label htmlFor="txtAvatar" className="mb-2"><b>Avatar:</b></label>
@@ -136,20 +159,65 @@ const Signup = () => {
                             </div>
                             <div className="form-group my-4">
                                 <label htmlFor="btnPassword" className="mb-2"><b>Contraseña:</b> </label>
-                                <input
-                                    type="password"
-                                    placeholder="******************"
-                                    className="form-control"
-                                    id="btnPassword"
-                                    name="password"
-                                    onChange={handleChange}
-                                    value={user.password} />
+                                <div className="input-group">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="******************"
+                                        className="form-control"
+                                        id="btnPassword"
+                                        name="password"
+                                        onChange={handleChange}
+                                        value={user.password} />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        onClick={togglePasswordVisibility}
+                                    >
+                                        {showPassword ? (
+                                            <i class="fa-solid fa-eye-slash"></i>
+                                        ) : (
+                                            <i class="fa-solid fa-eye"></i>
+                                        )}   
+
+                                    </button>
+                                </div>
                             </div>
+                            <div className="form-group my-4">
+                                <label htmlFor="btnConfirmPassword" className="mb-2"><b>Confirmar Contraseña:</b> </label>
+                                <div className="input-group">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="******************"
+                                        className="form-control"
+                                        id="btnConfirmPassword"
+                                        name="confirmPassword"
+                                        onChange={handleChange}
+                                        value={user.confirmPassword}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        onClick={toggleConfirmPasswordVisibility}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <i className="fa-solid fa-eye-slash"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-eye"></i>
+                                        )}
+                                    </button>
+                                </div>
+                                {user.confirmPassword && user.password && user.password !== user.confirmPassword && (
+                                    <p className="text-danger mt-2">¡Las contraseñas no coinciden!</p>
+                                )}
+                            </div>
+
                             <button
-                                className="btn btn-outline-primary w-100">
+                                className="btn btn-outline-primary w-100 mt-4"
+                                disabled={!user.name || !user.email || !user.username || !user.password || user.password !== user.confirmPassword}
+                            >
                                 Guardar
                             </button>
-
                         </form>
                     </div>
                 </div>

@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
-from api.utils import generate_sitemap, APIException, es_correo_valido
+from api.utils import generate_sitemap, APIException, es_correo_valido, send_email
 from flask_cors import CORS
 import os
 from base64 import b64encode
@@ -17,7 +17,7 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
- 
+
 @api.route("/health-check", methods=["GET"])
 def health_check():
     return jsonify({"status": "OK"}), 200
@@ -54,7 +54,6 @@ def register_user():
     if data.get("avatar") is not None:
         avatar = uploader.upload(data.get("avatar"))
         avatar = avatar["secure_url"]
-
 
     new_user = User(
         email=data["email"],
@@ -107,3 +106,79 @@ def me():
     user = User.query.get(id)
 
     return jsonify({"user": user.serialize()}), 200
+
+
+@api.route("/send-mail", methods=["GET"])
+def send_mail():
+    subject = "Esta es una prueba de correo"
+    to = "hrlp843@gmail.com"
+    body = """
+            <div>
+                <h1>Este es un test de correo electrónico</h1>
+            </div>
+
+            """
+    try:
+        send_email(subject, to, body)
+        return jsonify({"message": "Email sended sucessfully"}), 200
+    except Exception as error:
+        return jsonify({"message": f"Error: {error.args}"})
+
+
+@api.route("/reset-password", methods=["POST"])
+def recovery_password():
+    data = request.get_json()
+
+    # user = User.query.filter_by(email=data.get("email")).one_or_none()
+    # if user is None:
+    #     return jsonify({"message": "El correo no existe en la base de datos"})
+
+    recovery_token = create_access_token(identity=str(
+        data.get("email")), expires_delta=timedelta(minutes=30))
+
+    message = f"""
+                <div>
+                    <h1>Recuperación de contraseña, ingresa en el siguiente link</h1>
+                    <a 
+                        href="https://horrible-casket-q7x9qpj5rjxw269rg-3000.app.github.dev/password-update?token={recovery_token}"
+                    >
+                        ir a recuperar contraseña
+                    </a>
+                </div>
+
+                """
+
+    subject = "Recuperar contraseña"
+    email = data.get("email")
+
+    try:
+        response = send_email(subject, email, message)
+        if response:
+            return jsonify({"message": "Correo enviado exitosamente"}), 200
+        else:
+            return jsonify({"message": "Inténtelo nuevamente"}), 400
+    except Exception as error:
+        return jsonify({"message": f"Error al enviar correo de recuperación"}), 500
+
+
+@api.route("/update-password", methods=["PUT"])
+@jwt_required()
+def update_password():
+    email = get_jwt_identity()
+    password = request.get_json()
+
+    user = User.query.filter_by(email=email).one_or_none()
+
+    if user is not None:
+        salt = b64encode(os.urandom(32).decode("utf-8"))
+        password = generate_password_hash(f"{password.get("password")}{salt}")
+        user.salt = salt
+        user.password = password
+
+        try:
+            db.session.commit()
+            return jsonify({"message": "Contraseña actualizada exitosamente"}), 200
+        except Exception as error:
+            return jsonify({"message": "Error al actualizar la contraseña"}), 500
+
+    return jsonify({"message": "inténtelo nuevamente"}), 400

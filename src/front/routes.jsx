@@ -13,6 +13,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { Tasks } from "./pages/Tasks";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ResetPass } from "./pages/ResetPas";
+import { UpdatePassword } from "./pages/UpdatePassword";
 
 
 export const router = createBrowserRouter(
@@ -35,7 +37,11 @@ export const router = createBrowserRouter(
       } />
       <Route path="/login" element={< Login />} />
       <Route path="/signup" element={< Signup />} />
+      <Route path="/recovery-password" element={< ResetPass />} />
+      <Route path="/password-update" element={< UpdatePassword />} />
       <Route path="/demo" element={<Demo />} />
+
+      <Route path="*" element={<h1>Not Found</h1>} />
     </Route>
   )
 );

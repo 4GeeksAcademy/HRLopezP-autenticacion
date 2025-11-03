@@ -14,6 +14,7 @@ const urlBase = import.meta.env.VITE_BACKEND_URL
 
 const Login = () => {
     const [user, setUser] = useState(initialUserState)
+    const [showPassword, setShowPassword] = useState(false)
 
     const { dispatch } = useGlobalReducer()
     const navigate = useNavigate()
@@ -27,6 +28,9 @@ const Login = () => {
         })
     }
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -98,18 +102,29 @@ const Login = () => {
                         </div>
                         <div className="form-group my-4">
                             <label htmlFor="btnPassword" className="mb-2" ><b>Contraseña: </b></label>
-                            <input
-                                type="password"
-                                placeholder="******************"
-                                className="form-control"
-                                id="btnPassword"
-                                name="password"
-                                onChange={handleChange}
-                            />
+                            <div className="input-group"> 
+                                <input
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder="******************"
+                                    className="form-control"
+                                    id="btnPassword"
+                                    name="password"
+                                    onChange={handleChange}
+                                />
+                                <button
+                                    type="button" 
+                                    className="btn btn-outline-secondary"
+                                    onClick={togglePasswordVisibility} 
+                                >
+                                    {showPassword ? (
+                                        <i class="fa-solid fa-eye-slash"></i>
+                                    ) : (
+                                        <i class="fa-solid fa-eye"></i> 
+                                    )}
+                                </button>
+                            </div>
                         </div>
-                        <button
-                            className="btn btn-outline-primary w-100">
-                            Iniciar Sesión</button>
+                        <button className="btn btn-outline-primary w-100">Iniciar Sesión</button>
                     </form>
                 </div>
                 <div className="w-100"></div>
@@ -117,7 +132,7 @@ const Login = () => {
                     <Link to="/signup">
                         Registrarme
                     </Link>
-                    <Link>
+                    <Link to= {"/recovery-password"}>
                         Olvidó contraseña
                     </Link>
 
