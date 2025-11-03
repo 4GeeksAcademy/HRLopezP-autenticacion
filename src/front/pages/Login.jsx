@@ -102,9 +102,9 @@ const Login = () => {
                         </div>
                         <div className="form-group my-4">
                             <label htmlFor="btnPassword" className="mb-2" ><b>Contraseña: </b></label>
-                            <div className="input-group"> 
+                            <div className="input-group">
                                 <input
-                                    type={showPassword ? "text" : "password"} 
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="******************"
                                     className="form-control"
                                     id="btnPassword"
@@ -112,14 +112,14 @@ const Login = () => {
                                     onChange={handleChange}
                                 />
                                 <button
-                                    type="button" 
+                                    type="button"
                                     className="btn btn-outline-secondary"
-                                    onClick={togglePasswordVisibility} 
+                                    onClick={togglePasswordVisibility}
                                 >
                                     {showPassword ? (
-                                        <i class="fa-solid fa-eye-slash"></i>
+                                        <i className="fa-solid fa-eye-slash"></i>
                                     ) : (
-                                        <i class="fa-solid fa-eye"></i> 
+                                        <i className="fa-solid fa-eye"></i>
                                     )}
                                 </button>
                             </div>
@@ -132,7 +132,7 @@ const Login = () => {
                     <Link to="/signup">
                         Registrarme
                     </Link>
-                    <Link to= {"/recovery-password"}>
+                    <Link to={"/recovery-password"}>
                         Olvidó contraseña
                     </Link>
 

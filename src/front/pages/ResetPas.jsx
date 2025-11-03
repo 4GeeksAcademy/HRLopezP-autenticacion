@@ -1,4 +1,7 @@
 import { useState } from "react"
+import { Toaster, toast } from "sonner"
+import { useNavigate } from "react-router-dom"
+import "../styles/signup.css"
 
 const urlBase = import.meta.env.VITE_BACKEND_URL
 
@@ -7,51 +10,66 @@ export const ResetPass = () => {
         email: ""
     })
 
+    const navigate = useNavigate()
+
+    const handleEmailChange = (event) => {
+        setEmail({ email: event.target.value })
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault()
 
-        if (email.email.trim() == "") {
-            alert("Debe colocar un correo válido")
-            return
+        if (email.email.trim() === "") {
+            toast.error("Debe colocar un correo válido");
+            return;
         }
         try {
             const response = await fetch(`${urlBase}/reset-password`, {
-                methods: ["POST"],
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(email)
             })
 
-            if (response.ok) {
-                console.log("Vemos qué hacer", response)
+            if (response.ok || response.status === 404) {
+                toast.success("Si la dirección existe, recibirás un correo para restablecer la contraseña.");
+                setTimeout(() => {
+                    navigate("/login")
+                }, 3000);
+
+                setEmail({ email: "" })
+            } else {
+                toast.error("Ocurrió un error inesperado al procesar tu solicitud.");
             }
         } catch (error) {
-            console.log(error)
+            toast.error("Error de conexión con el servidor. Intenta de nuevo más tarde.")
         }
     }
 
 
     return (
-        <div className="container">
-            <div className="row justify-content-center">
-                <h1>Recuperación de contraseña</h1>
-                <div className="col-12 col-md-6 border py-4">
+        <div className="container mb-5 pb-5">
+            <Toaster position="top-center" richColors />
+            <div className="row d-flex justify-content-center my-5">
+                <h1 className="text-center pb-5">Recuperación de contraseña</h1>
+                <div className="col-12 col-md-6 border py-4 bg-azul">
                     <form
-                        sonSubmit={handleSubmit}>
+                        onSubmit={handleSubmit}>
                         <div className="form-group mb-3">
-                            <label htmlFor="btnRecoveryPassword">Correo electrónico</label>
+                            <label htmlFor="btnRecoveryPassword" className="mb-3">Correo electrónico</label>
                             <input type="email"
-                                className="form-control"
+                                className="form-control mb-4"
                                 placeholder="ejemplo@gmail.com"
                                 id="btnRecoveryPassword"
                                 name="email"
                                 value={email.email}
-                                onChange={(target) => setEmail({ email: target.value })}
+                                onChange={handleEmailChange}
                             />
                         </div>
                         <button
-                            className="btn btn-success w-100">
+                            className="btn btn-outline-success w-100"
+                            disabled={email.email.trim() === ""}>
                             Recuperar contraseña</button>
                     </form>
                 </div>

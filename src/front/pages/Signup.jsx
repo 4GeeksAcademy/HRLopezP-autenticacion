@@ -168,15 +168,15 @@ const Signup = () => {
                                         name="password"
                                         onChange={handleChange}
                                         value={user.password} />
-                                    <button
+                                    <button 
                                         type="button"
                                         className="btn btn-outline-secondary"
                                         onClick={togglePasswordVisibility}
                                     >
                                         {showPassword ? (
-                                            <i class="fa-solid fa-eye-slash"></i>
+                                            <i className="fa-solid fa-eye-slash"></i>
                                         ) : (
-                                            <i class="fa-solid fa-eye"></i>
+                                            <i className="fa-solid fa-eye"></i>
                                         )}   
 
                                     </button>

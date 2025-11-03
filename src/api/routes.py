@@ -128,57 +128,62 @@ def send_mail():
 @api.route("/reset-password", methods=["POST"])
 def recovery_password():
     data = request.get_json()
+    email = data.get("email")
 
-    # user = User.query.filter_by(email=data.get("email")).one_or_none()
-    # if user is None:
-    #     return jsonify({"message": "El correo no existe en la base de datos"})
+    # recovery_token = create_access_token(identity=str(
+    #     data.get("email")), expires_delta=timedelta(minutes=30))
 
-    recovery_token = create_access_token(identity=str(
-        data.get("email")), expires_delta=timedelta(minutes=30))
+    user = User.query.filter_by(email=email).one_or_none()
 
-    message = f"""
+    if user:
+        recovery_token = create_access_token(identity=str(user.id), expires_delta=timedelta(minutes=30))
+
+        message = f"""
                 <div>
                     <h1>Recuperación de contraseña, ingresa en el siguiente link</h1>
                     <a 
                         href="https://horrible-casket-q7x9qpj5rjxw269rg-3000.app.github.dev/password-update?token={recovery_token}"
                     >
-                        ir a recuperar contraseña
+                        Ir a recuperar contraseña
                     </a>
                 </div>
 
                 """
 
-    subject = "Recuperar contraseña"
-    email = data.get("email")
+        subject = "Recuperar contraseña"
+        email = data.get("email")
 
-    try:
-        response = send_email(subject, email, message)
-        if response:
-            return jsonify({"message": "Correo enviado exitosamente"}), 200
-        else:
-            return jsonify({"message": "Inténtelo nuevamente"}), 400
-    except Exception as error:
-        return jsonify({"message": f"Error al enviar correo de recuperación"}), 500
+        try:
+            send_email(subject, email, message)
+        except Exception as error:
+         print(f"Error al intentar enviar el correo de recuperación a {email}: {error}")
+    
+    return jsonify({"message": "Si la dirección existe, recibirás un correo para restablecer la contraseña."}), 200
 
 
 @api.route("/update-password", methods=["PUT"])
 @jwt_required()
 def update_password():
-    email = get_jwt_identity()
-    password = request.get_json()
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    new_password_plain = data.get("password")
 
-    user = User.query.filter_by(email=email).one_or_none()
+    if not new_password_plain:
+        return jsonify({"message": "La contraseña es requerida"}), 400
+
+    user = User.query.get(user_id)
 
     if user is not None:
-        salt = b64encode(os.urandom(32).decode("utf-8"))
-        password = generate_password_hash(f"{password.get("password")}{salt}")
+        salt = b64encode(os.urandom(32)).decode("utf-8")
+        hashed_password = generate_password_hash(f"{new_password_plain}{salt}")
         user.salt = salt
-        user.password = password
+        user.password = hashed_password
 
         try:
             db.session.commit()
             return jsonify({"message": "Contraseña actualizada exitosamente"}), 200
         except Exception as error:
-            return jsonify({"message": "Error al actualizar la contraseña"}), 500
+            db.session.rollback()
+            return jsonify({"message": f"Error al actualizar la contraseña: {error.args}"}), 500
 
     return jsonify({"message": "inténtelo nuevamente"}), 400
