@@ -136,13 +136,14 @@ def recovery_password():
     user = User.query.filter_by(email=email).one_or_none()
 
     if user:
-        recovery_token = create_access_token(identity=str(user.id), expires_delta=timedelta(minutes=30))
+        recovery_token = create_access_token(identity=str(
+            user.id), expires_delta=timedelta(minutes=5))
 
         message = f"""
                 <div>
                     <h1>Recuperación de contraseña, ingresa en el siguiente link</h1>
                     <a 
-                        href="https://horrible-casket-q7x9qpj5rjxw269rg-3000.app.github.dev/password-update?token={recovery_token}"
+                        href="{os.getenv("VITE_FRONTEND_URL")}/password-update?token={recovery_token}"
                     >
                         Ir a recuperar contraseña
                     </a>
@@ -156,8 +157,9 @@ def recovery_password():
         try:
             send_email(subject, email, message)
         except Exception as error:
-         print(f"Error al intentar enviar el correo de recuperación a {email}: {error}")
-    
+            print(
+                f"Error al intentar enviar el correo de recuperación a {email}: {error}")
+
     return jsonify({"message": "Si la dirección existe, recibirás un correo para restablecer la contraseña."}), 200
 
 
